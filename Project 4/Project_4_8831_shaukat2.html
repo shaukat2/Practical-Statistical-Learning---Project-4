@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sameen Shaukat - Net ID: shaukat2" />
 
-<meta name="date" content="2021-12-14" />
+<meta name="date" content="2021-12-13" />
 
 <title>Project 4: Movielense Data: Recommender System</title>
 
@@ -169,7 +169,7 @@ pre code {
 
 <h1 class="title toc-ignore">Project 4: Movielense Data: Recommender System</h1>
 <h4 class="author">Sameen Shaukat - Net ID: shaukat2</h4>
-<h4 class="date">12/14/2021</h4>
+<h4 class="date">12/13/2021</h4>
 
 </div>
 
@@ -453,7 +453,7 @@ to_keep = 15  ## given 15 items
 threshold = 0 ## ratings above 0 as the cutoff point</code></pre>
 <div id="user-based-collaborative-filtering-cosine-similarity" class="section level4">
 <h4>User-Based Collaborative Filtering: Cosine Similarity</h4>
-<p>UBCF_Z_C: Z-score normalization is applied to the data;Z-Score centering does a slightly better job that center normalizatiob</p>
+<p>UBCF_Z_C: Z-score normalization is applied to the data;Z-Score centering does a slightly better job that center normalization.</p>
 <pre class="r"><code>UBCF_Z_C = rep(0,10)
 for(i in (1:10)){
 # split the data into the training and the test set:
@@ -471,7 +471,6 @@ p3 &lt;- predict(UBCF_ZCosine, getData(scheme, &quot;known&quot;), type=&quot;ra
 UBCF_Z_C[i] = calcPredictionAccuracy(p3, getData(scheme, &quot;unknown&quot;))[1]
 
 }</code></pre>
-<pre class="r"><code>j = 1:10</code></pre>
 </div>
 <div id="item-based-collaborative-filtering-cosine-similarity" class="section level4">
 <h4>Item-Based Collaborative Filtering: Cosine Similarity</h4>
