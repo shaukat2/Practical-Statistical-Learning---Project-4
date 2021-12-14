@@ -1,0 +1,134 @@
+---
+title: "Project 4: Movielense Data: Recommender System"
+author: "Sameen Shaukat - Net ID: shaukat2"
+date: "12/01/2021"
+output: html_document
+fontsize: 11pt
+geometry: margin=0.5in
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
+```
+
+```{r, echo=FALSE}
+auc = c(0.9624945, 0.9609844, 0.9616583, 0.9615458, 0.9618619)
+runtime = c( 35.11019, 34.19087, 34.36521, 33.74316, 33.40585)
+splits = rep(1:5)
+auc_df = data.frame(splits, auc, runtime)
+names(auc_df) = c("Split no.", "AUC", "Runtime in Seconds")
+```
+
+# Goals  
+
+In this project, our goal is to develop a content based recommendation system(System I) and collaborative recommendation system(System II).
+
+* **System I:** is recommendation based on genres. We ask user to input their favorite Genre, and we provide two recommendation schemes: 
+   + Method I:  High Rated Movies.
+   + Method II: High Rate Popularity based on number of votes.
+
+I have used python for this task, simply because I find data manipulation is easier in Python.
+
+* **System II:** is a collaborative recommendation system. User will provide rating for couple of movies for this and this System will recommend movies based on this input. I have used following two methods for this.  
+
+   + User-based (UBCF): This method works on the assumption that similar users have similar taste. UBCF uses the logic and recommends items by finding similar users to the user.  
+   
+   + Item-based (IBCF): This method finds similarities between different items by using similarity measure, these similarity values are used to predict;
+
+# Technical Implementation  
+
+This dataset contains two files.
+
+**alldata.tsv**: This is the main dataset with 50,000 records and 4 columns. We will be building our vocabulary based on this dataset.  
+**project3_splits.csv**: This file contains 25,000 rows and 5 columns, each column containing the 25,000 row-numbers of a test data. This will help to create 5 test and train splits to train a model and then predict and perform analysis.
+
+## Dataset 
+**alldata.csv** contains following columns:
+
+**Col 1: “id”**: the identification number  
+**Col 2: “sentiment”**: 0 = negative and 1 = positive  
+**Col 3: “score”**: the 10-point score assigned by the reviewer. Scores 1-4 correspond to negative sentiment; Scores 7-10 corrspond to positive sentiment. This dataset contains no reviews with score 5 or 6.  
+**Col 4: “review”**: Review of the movie.  
+
+## Data Clean-Up & Model Choice  
+
+As this dataset have been part a lot of research, insight is already available online. By scraping through these articles and guidance provided on campuswire by the Professor following processing was applied to data, I was able to build a vocabulary of size under 1000 words and was also able to achieve AUC >= 0.96 for all five splits. Let's look at the pseudo code for building vocabulary and model fitting step by step.
+
+### Data Cleaning  
+
+I wrote a helper function that will help clean the data as we need to apply this cleaning on  
+  • Vocabulary Building Data  
+  • Training Data  
+  • Testing Data  
+
+This function  
+  • Removes punctuations & special characters   
+  • Changes text to lower case  
+  • Removes stopwords
+
+### Vocabulary Building  
+
+This was done based on campuswire posts by Professor and online research available. I used the following step to build vocabulary. 
+
+  • Data Cleaning of column "review".  
+  • Tokenizing text from step 1.  
+  • Building a base vocabulary with bi-grams.  
+  • Removing irrelevant words by pruning method.  
+  • Reducing vocabulary size by using a two-sample t-test (Reference: Professor's post on campus-wire).  
+  • Created a data matrix using vocabulary in step 5 and fit a lasso regression to identify most common terms.  
+  • Selected the final vocabulary from step 6 with maximum degrees of freedom below 1000. 
+
+I was able to reduce the vocabulary size to 931 words.
+
+### Model Selection, Training & Predictions  
+
+For model selection, I tested a couple of algorithms like Naive Bayes, Logistic Regression, Ridge Regression, Lasso Regression and Elastic-Net Regression. Playing around with these I was able to achieve this project's goal by using Ridge Regression. I used cv.glmnet from glmnet library with following parameter settings.  
+
+**apha** = 0 (Ridge Regression)  
+**family** = binomial  
+**nfolds** = 5 (5-fold cross-validation)  
+**thresh** = 0.001 (convergence threshold for co-ordinate descent)  
+**maxit** = 1000 (maximum number of passes over data)
+
+Predictions were made using lambda.min on pre-processed test data for each split. These prediction probabilities against ids were stored in text file.
+
+### Challenges and Interesting Findings  
+
+Reducing vocabulary size to achieve AUC goal was a quite a challenge for me. I tried many approaches but eventually was able to produce a good fit vocabulary with help of Professor's notes. Interestingly, I noticed that If I applied proper stop words removal (Stop Words pre-built in libraries), it resulted in lesser AUC values which was quite strange. I noticed the more data cleaning I applied the worst it got. I really do not understand why this happened as data cleaning should make model performance better.
+
+I also tried stemming and lemmatization in order to reduce vocabulary size, but this also didn't improve AUC for me.
+
+### Performance & Validation  
+
+Our main goal for this project was to reach 0.96 AUC for 5 splits. Following table shows our AUC values for all splits along with their execution times. These calculations were done using a 2020 model of Macbook Air (M1 Chip, 8-Core and 8 GB of RAM).
+
+```{r, echo=FALSE}
+kable(auc_df)%>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+### Interpretability  
+
+The main idea behind this project was to build a classifier that can identify a positive or negative review. I think that using state of the art bag of words model to build vocabulary of positive and negative words is the most important part of this problem. 
+
+Once a sample review is provided to assess the sentiment, this model cross-maps the negative and positive words that are already in the vocabulary, if positive words occurrence is more than the negative words occurrence, it will predict the probability of this review to be more on the positive side.
+
+If we are able to build a good vocabulary, we should be able to build a better prediction model. But this vocabulary might not work well or work poorly for a different kind of sentiment analysis problem for example political reviews or jewelry store reviews.
+
+### Conclusion
+To achieve goals for this project, I faced many challenges but Professor Liang's notes were really helpful in achieving the task. I came to learn a lot about the importance of data cleaning and the role it can play in the performance of a fitted model.
+  
+### Reference Material  
+
+  • https://www.kaggle.com/c/word2vec-nlp-tutorial  
+  • Professor Liang’s Campuswire postings for the Project 3 (Fall 2021).   
+  • https://cran.r-project.org/web/packages/text2vec/vignettes/text-vectorization.html
+  
+  
+  
+
+
+

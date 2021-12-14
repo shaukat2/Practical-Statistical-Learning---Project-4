@@ -1,0 +1,91 @@
+,Title,Avg_Rating,Num_Votes,Genre
+44,Star Wars: Episode IV - A New Hope,4.453694416583082,2991,Action
+131,Star Wars: Episode V - The Empire Strikes Back,4.292976588628763,2990,Action
+71,Star Wars: Episode VI - Return of the Jedi,4.022892819979188,2883,Action
+120,Jurassic Park,3.7638473053892216,2672,Action
+48,Saving Private Ryan,4.337353938937053,2653,Action
+44,Star Wars: Episode IV - A New Hope,4.453694416583082,2991,Adventure
+131,Star Wars: Episode V - The Empire Strikes Back,4.292976588628763,2990,Adventure
+71,Star Wars: Episode VI - Return of the Jedi,4.022892819979188,2883,Adventure
+120,Jurassic Park,3.7638473053892216,2672,Adventure
+261,Men in Black,3.739952718676123,2538,Adventure
+40,Toy Story,4.146846413095811,2077,Animation
+705,Who Framed Roger Rabbit?,3.6798221234018897,1799,Animation
+4,"Bug's Life, A",3.854374633000587,1703,Animation
+50,Toy Story 2,4.218927444794953,1585,Animation
+33,Aladdin,3.788304959289415,1351,Animation
+26,E.T. the Extra-Terrestrial,3.9651828999559275,2269,Children's
+40,Toy Story,4.146846413095811,2077,Children's
+485,Babe,3.8914905768132497,1751,Children's
+9,"Wizard of Oz, The",4.247962747380675,1718,Children's
+4,"Bug's Life, A",3.854374633000587,1703,Children's
+111,American Beauty,4.3173862310385065,3428,Comedy
+22,Back to the Future,3.9903213317847466,2583,Comedy
+261,Men in Black,3.739952718676123,2538,Comedy
+141,Shakespeare in Love,4.127479949345715,2369,Comedy
+5,"Princess Bride, The",4.3037100949094045,2318,Comedy
+51,Fargo,4.254675686430561,2513,Crime
+270,L.A. Confidential,4.219405594405594,2288,Crime
+195,"Godfather, The",4.524966261808367,2223,Crime
+269,Pulp Fiction,4.278212805158913,2171,Crime
+273,"Usual Suspects, The",4.517106001121705,1783,Crime
+1134,Roger & Me,4.0739348370927315,798,Documentary
+4986,Hoop Dreams,4.18854748603352,716,Documentary
+467,Crumb,4.063136456211812,491,Documentary
+7102,American Movie,4.013559322033898,295,Documentary
+5686,When We Were Kings,4.32129963898917,277,Documentary
+111,American Beauty,4.3173862310385065,3428,Drama
+131,Star Wars: Episode V - The Empire Strikes Back,4.292976588628763,2990,Drama
+48,Saving Private Ryan,4.337353938937053,2653,Drama
+135,"Silence of the Lambs, The",4.3518231186966645,2578,Drama
+51,Fargo,4.254675686430561,2513,Drama
+44,Star Wars: Episode IV - A New Hope,4.453694416583082,2991,Fantasy
+26,E.T. the Extra-Terrestrial,3.9651828999559275,2269,Fantasy
+67,Star Wars: Episode I - The Phantom Menace,3.409777777777778,2250,Fantasy
+1259,Beetlejuice,3.5678929765886287,1495,Fantasy
+19,Big,3.8558014755197854,1491,Fantasy
+270,L.A. Confidential,4.219405594405594,2288,Film-Noir
+529,Blade Runner,4.273333333333333,1800,Film-Noir
+705,Who Framed Roger Rabbit?,3.6798221234018897,1799,Film-Noir
+193,Chinatown,4.339240506329114,1185,Film-Noir
+478,"Maltese Falcon, The",4.395973154362416,1043,Film-Noir
+1003,Ghostbusters,3.9055479138010085,2181,Horror
+453,Alien,4.159584980237154,2024,Horror
+700,Jaws,4.089569829110195,1697,Horror
+1172,Psycho,4.218527315914489,1263,Horror
+1082,"Blair Witch Project, The",3.0315278900565885,1237,Horror
+9,"Wizard of Oz, The",4.247962747380675,1718,Musical
+33,Aladdin,3.788304959289415,1351,Musical
+1075,"Blues Brothers, The",3.9395973154362416,1341,Musical
+509,"Rocky Horror Picture Show, The",3.291159772911598,1233,Musical
+294,"Lion King, The",3.8608385370205176,1121,Musical
+270,L.A. Confidential,4.219405594405594,2288,Mystery
+518,2001: A Space Odyssey,4.068764568764569,1716,Mystery
+65,Mission: Impossible,3.432874918140144,1527,Mystery
+279,"Talented Mr. Ripley, The",3.503380916604057,1331,Mystery
+193,Chinatown,4.339240506329114,1185,Mystery
+71,Star Wars: Episode VI - Return of the Jedi,4.022892819979188,2883,Romance
+141,Shakespeare in Love,4.127479949345715,2369,Romance
+5,"Princess Bride, The",4.3037100949094045,2318,Romance
+123,Groundhog Day,3.953028972783143,2278,Romance
+178,Forrest Gump,4.087967183226983,2194,Romance
+44,Star Wars: Episode IV - A New Hope,4.453694416583082,2991,Sci-Fi
+131,Star Wars: Episode V - The Empire Strikes Back,4.292976588628763,2990,Sci-Fi
+71,Star Wars: Episode VI - Return of the Jedi,4.022892819979188,2883,Sci-Fi
+120,Jurassic Park,3.7638473053892216,2672,Sci-Fi
+104,Terminator 2: Judgment Day,4.058512646281616,2649,Sci-Fi
+104,Terminator 2: Judgment Day,4.058512646281616,2649,Thriller
+139,"Matrix, The",4.315830115830116,2590,Thriller
+135,"Silence of the Lambs, The",4.3518231186966645,2578,Thriller
+51,Fargo,4.254675686430561,2513,Thriller
+38,"Sixth Sense, The",4.406262708418057,2459,Thriller
+131,Star Wars: Episode V - The Empire Strikes Back,4.292976588628763,2990,War
+71,Star Wars: Episode VI - Return of the Jedi,4.022892819979188,2883,War
+48,Saving Private Ryan,4.337353938937053,2653,War
+99,Braveheart,4.234957020057307,2443,War
+23,Schindler's List,4.510416666666667,2304,War
+130,Dances with Wolves,3.9152308752584424,1451,Western
+1509,Butch Cassidy and the Sundance Kid,4.215644820295983,1419,Western
+2008,Back to the Future Part III,3.2421602787456445,1148,Western
+1349,Blazing Saddles,4.047363717605005,1119,Western
+1348,Unforgiven,4.0902708124373115,997,Western

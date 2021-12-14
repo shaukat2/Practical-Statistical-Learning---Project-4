@@ -1,0 +1,297 @@
+---
+title: "Project 4: Movielense Data: Recommender System"
+author: "Sameen Shaukat - Net ID: shaukat2"
+date: "12/14/2021"
+output: html_document
+fontsize: 11pt
+geometry: margin=0.5in
+urlcolor: blue
+---
+
+***
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
+```
+
+```{r include=FALSE}
+start_time <- Sys.time()
+library(recommenderlab)
+library(ggplot2)
+library(data.table)
+library(reshape2)
+library(knitr)
+ library(readr)
+```
+
+
+# Goals  
+
+In this project, our goal is to develop a content based recommendation system(System I) and collaborative recommendation system(System II).
+
+* **System I:** is recommendation based on genres. We ask user to input their favorite Genre, and we provide two recommendation schemes: 
+   + Method I:  High Rated Movies.
+   + Method II: High Rate Popularity based on number of votes.
+
+I have used python for this task, simply because I find data manipulation is easier in Python.
+
+* **System II:** is a collaborative recommendation system. User will provide rating for couple of movies for this and this System will recommend movies based on this input. I have used following two methods for this.  
+
+   + User-based (UBCF): This method works on the assumption that similar users have similar taste. UBCF uses the logic and recommends items by finding similar users to the user.  
+   
+   + Item-based (IBCF): This method finds similarities between different items by using similarity measure, these similarity values are used to predict.
+
+
+```{r include=FALSE}
+# Code Excrept from Professor's Notes
+ratings = read.csv('ratings.dat', 
+                   sep = ':',
+                   colClasses = c('integer', 'NULL'), 
+                   header = FALSE)
+colnames(ratings) = c('UserID', 'MovieID', 'Rating', 'Timestamp')
+
+movies = readLines('movies.dat')
+movies = strsplit(movies, split = "::", fixed = TRUE, useBytes = TRUE)
+movies = matrix(unlist(movies), ncol = 3, byrow = TRUE)
+movies = data.frame(movies, stringsAsFactors = FALSE)
+colnames(movies) = c('MovieID', 'Title', 'Genres')
+movies$MovieID = as.integer(movies$MovieID)
+
+# convert accented characters
+movies$Title[73]
+movies$Title = iconv(movies$Title, "latin1", "UTF-8")
+movies$Title[73]
+
+# extract year
+movies$Year = as.numeric(unlist(
+  lapply(movies$Title, function(x) substr(x, nchar(x)-4, nchar(x)-1))))
+
+
+users = read.csv('users.dat',
+                 sep = ':', header = FALSE)
+users = users[, -c(2,4,6,8)] # skip columns
+colnames(users) = c('UserID', 'Gender', 'Age', 'Occupation', 'Zip-code')
+
+HighRatingMovies <- read_csv("HighRatingMovies.csv")
+HighVoteRating <- read_csv("HighVoteRating.csv")
+
+HighRatingMovies = data.frame(HighRatingMovies)
+names(HighRatingMovies) = c("Movie ID", "Title", "Average Rating" , "Genre")
+HighRatingMovies = subset(HighRatingMovies, Genre == "Action")
+HighVoteRating = data.frame(HighVoteRating)
+names(HighVoteRating) = c("Movie ID", "Title", "Average Rating" ,"Number of Votes", "Genre")
+HighVoteRating = subset(HighVoteRating, Genre == "Action")
+
+```
+
+# Technical Implementation  
+
+This dataset contains three files. 
+
+
+**movies.dat**: Contains data about movie titles, genre, year etc  
+**ratings.dat**: Contains data about movie ratings, user information, movie ID etc 
+**users.dat**: Contains data about user information. 
+
+Following Movie Genres are available in the dataset:
+
+* Action
+* Adventure
+* Animation
+* Children's
+* Comedy
+* Crime
+* Documentary
+* Drama
+* Fantasy
+* Film-Noir
+* Horror
+* Musical
+* Mystery
+* Romance
+* Sci-Fi
+* Thriller
+* War
+* Western
+
+## Data Clean-Up
+
+As this dataset have been part a lot of research, insight is already available online. By scraping through these articles and guidance provided on campuswire by the Professor, conversion to accented characters was applied. A new column year was extracted from movie title and added to movies dataset. Unnecessary columns were removed from the user.
+
+## System 1: Models Choices
+
+I used the following steps for this.
+
+  • After cleaning data, merge movies and ratings data.  
+  • Identify average rating per movie and number of ratings per movie.  
+  • Merge dataframe from step 2, to users data.  
+  • Split dataframe based on Genres.  
+  • Identify Top 5 Highly Rated and Highly-Voted & Rated movies.  
+  • Store in csv for later use.  
+
+Goal was to achieve following two tasks for System 1.
+
+**Highly Rated  Genre - Wise Movies**   
+
+Top Highly Rated movies for Action Genre are
+```{r echo=FALSE}
+kable(HighRatingMovies)%>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+**Highly Voted & Rated (Most Popular) Genre - Wise Movies**  
+
+Top Highly Voted & Rated movies for Action Genre are
+
+```{r echo=FALSE}
+kable(HighVoteRating)%>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+*Python Code for this is available in directory. ("Project 4 Python Implementation")
+
+## System 2: Models Choices
+
+Takinh help from Professor's course, I used recommenderlab library to achieve this task. Now that we have our data set we will construct the user item matrix. The rows of the matrix represent the users and the columns of the matrix represent the movies
+
+### Create realRatingMatrix
+
+```{r}
+ratings = as(ratings, 'realRatingMatrix')
+```
+
+
+### Training and Testing Data
+We split the data into 80% training and 20% testing. The training set will contain 80% of the data and the set set will contain the other 20%. We will use the built in recomenderlab function evaluationScheme to split the data. This will also allow us to us the build in evaluation functions to measure our performance.
+
+```{r}
+train_proportion = 0.8
+to_keep = 15  ## given 15 items
+threshold = 0 ## ratings above 0 as the cutoff point
+
+```
+
+
+#### User-Based Collaborative Filtering: Cosine Similarity
+
+UBCF_Z_C: Z-score normalization is applied to the data;Z-Score centering does a slightly better job that center normalization.
+
+```{r, cache=TRUE}
+UBCF_Z_C = rep(0,10)
+for(i in (1:10)){
+# split the data into the training and the test set:
+scheme = evaluationScheme(ratings, method="split", train=train_proportion, given=to_keep, goodRating=threshold)
+
+# Z-score normalization
+UBCF_ZCosine <- Recommender(getData(scheme, "train"), "UBCF", param=list(normalize = "Z-score",method="Cosine"))
+
+#Evaluate the models:
+
+# compute predicted ratings
+p3 <- predict(UBCF_ZCosine, getData(scheme, "known"), type="ratings")
+
+
+UBCF_Z_C[i] = calcPredictionAccuracy(p3, getData(scheme, "unknown"))[1]
+
+}
+```
+
+
+
+#### Item-Based Collaborative Filtering: Cosine Similarity
+
+```{r, cache=TRUE}
+IBCF_Z_C = rep(0,10)
+for(i in (1:10)){
+# split the data into the training and the test set:
+scheme = evaluationScheme(ratings, method="split", train=train_proportion, given=to_keep, goodRating=threshold)
+
+# Z-score normalization
+IBCF_ZCosine <- Recommender(getData(scheme, "train"), "IBCF", param=list(normalize = "Z-score",method="Cosine"))
+
+#Evaluate the models:
+
+# compute predicted ratings
+p3 <- predict(IBCF_ZCosine, getData(scheme, "known"), type="ratings")
+
+
+IBCF_Z_C[i] = calcPredictionAccuracy(p3, getData(scheme, "unknown"))[1]
+}
+
+```
+
+
+```{r}
+
+j=1:10
+rmsedf = data.frame(j,UBCF_Z_C, IBCF_Z_C)
+names(rmsedf) = c("Iteration No.","UBFC RMSE", "IBFC RMSE")
+kable(rmsedf)%>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+
+#### Evaluation result  
+
+It looks like the UBCF' performance(prediction accuracy) are better than Item-based Collaborative Filtering. 
+
+
+#### Save pre-trained models
+I saved the model and then used them in the App.
+
+
+## Technical details
+
+- Will you normalize the rating matrix? If so, which normalization option you use?\
+  We let the recommenderlab do the normalization, some of our models have setting of normalization option 'Z-score'.
+
+- What's the nearest neighborhood size you use?\
+  The recommenderlab's k = 3 nearest neighbors(u1, u2 and u3) are selected.
+
+- Which similarity metric you use?\
+  Cosine Similarity
+  
+- If you say prediction is based on a "weighted average", then explain what weights you use\
+  The prediction on content-based algorithm(System I) is not based on a 'weighted average'.
+
+- Will you still have missing values after running the algorithm? If so, how you handle those missing values?\
+  As per Michael Hahsler's tutorial on recommenderlab, the solution is that if we assume users favor only a small fraction of the items and most items with no rating at all, this can lead to the problems in computing similarities using Pearson correlation or Cosine similarity, Jaccard index is a better fit.
+
+
+## Movie Recommendation App
+
+  * It is a shiny app with System I and System II algorithms
+  * System I (content based)
+    + The app needs to take the input from users of their favorite genre, and display the result
+  
+ * System II (Collaborative Filtering)
+   + The app need the users to rate as many movies as possible;
+   + System will discover movies for the users by Item-based Collaborative model.
+
+
+## Deploy the App
+
+Due to limited time and resources, I wasn't able to deploy the app on web. However it works if run through in R Studio environment.
+
+
+
+## Conclusion
+
+Multiple models were compared on the dataset, the UBCF model has the better performance for System II. These algorithms can take many classes of input and provide similarity ranking better fit for the user needs.
+Generally, The item-base CF performs better in practice: easier to find similar items, but difficult to find similar people.
+
+**All code available on https://github.com/shaukat2/PSL-Project4-/**
+
+## Reference 
+1. Campuswire, Office Hours and Professor's Notes
+2. Moviewlens: https://grouplens.org/datasets/movielens/
+4. Machine Learning Project – Data Science Movie Recommendation System Project in R 
+   https://data-flair.training/blogs/data-science-r-movie-recommendation/
+5. Movie Recommendation System: https://jeknov.shinyapps.io/movieRec/
+6. Item-Based Collaborative Filtering Recommendation: 
+   https://www.kaggle.com/hendraherviawan/itembased-collaborative-filter-recommendation-r
+7. User-Based and Item-Based Collaborative Filtering https://rpubs.com/jt_rpubs/285729
+8. Movie Recommendation System  https://jeknov.shinyapps.io/movieRec/
+9. Michael Hahsler: recommenderlab: A Framework for Developing and Testing Recommendation Algorithms 
+    https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf
